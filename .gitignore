@@ -6,13 +6,14 @@
 
 # Include everything within the code folder
 !code/*
+
 *.py[cod]
+*.py~
 
 # Include everything within the code folder
-!code/*
-*.py[cod]
+!rapport/
 
-# Include everything within the code folder
+rapport/*
 !rapport/cnn_project_rapport.pdf
 
 # Include README.md
