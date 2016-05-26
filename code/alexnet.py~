@@ -1,0 +1,10 @@
+import theano
+from theano import tensor as T
+import numpy as np
+from theano.tensor.signal.downsample import max_pool_2d
+
+# Max-pooling - Reduce the overall computational 
+# Five Convolutional layers
+# Three fully-connected layers
+# Dropout - To prevent the network to get biased (prevent overfitting) Random dropping neurals.
+# 

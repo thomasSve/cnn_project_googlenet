@@ -1,0 +1,9 @@
+
+
+### Main File ###
+
+def train_net():
+    return 0
+
+if __name__ = "__main__":
+    main()    

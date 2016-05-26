@@ -1,0 +1,23 @@
+# Ignore everything
+*
+
+# Include Code-folder
+!code/
+
+# Include everything within the code folder
+!code/*
+*.py[cod]
+
+# Include everything within the code folder
+!code/*
+*.py[cod]
+
+# Include everything within the code folder
+!rapport/cnn_project_rapport.pdf
+
+# Include README.md
+!README.md
+
+# Include gitignore
+!.gitignore
+
