@@ -1,0 +1,10 @@
+import numpy as np
+import theano
+import theano.tensor as T
+
+
+class ConvPoolLayer():
+    def __init__():
+        '''
+        Convolutional layer with pooling
+        '''

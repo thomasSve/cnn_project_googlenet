@@ -1,0 +1,8 @@
+
+
+class Weight():
+
+    def __init__(self, w_shape, mean = 0, std = 0.01):
+        super(Weight, self).__init__()
+        if std != 0:
+            self.np_values = np.asarray(rng.normal(mean, std, w_shape), dtype=theano.config.floatX)
