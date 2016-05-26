@@ -1,9 +1,0 @@
-import numpy as np
-import theano
-import theano.tensor as T
-
-class SoftMaxLayer():
-    def __init__():
-        '''
-        
-        '''
