@@ -9,12 +9,8 @@
 
 *.py[cod]
 *.py~
-
-!code/layers/
-!code/layers/*
-
-!code/preprocessing/
-!code/preprocessing/*
+!main.py
+!preprocess.py
 
 # Include everything within the code folder
 !rapport/
