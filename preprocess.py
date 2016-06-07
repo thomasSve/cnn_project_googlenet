@@ -44,13 +44,16 @@ def load_training_set(path, wnids, Image):
         bbox_file = path + class_id + "/" + class_id + "_boxes.txt"
         for line  in open(bbox_file):
             words = line.split()
-            img = Image.open(path + class_id + "/images/" + words[0]).convert('L')
+            #img = Image.open(path + class_id + "/images/" + words[0]).convert('L')
+            img = Image.open(path + class_id + "/images/" + words[0])
+
             image = np.array(img)
             #image_cropped = crop_image(image, words[1:])
-            bbox.append(words[1:])
-            image = np.ravel(image)  #Reshape image into columnvector
-            images.append(image) # Append image to dataset
-            y.append(class_id)
+            if image.ndim == 3:
+                bbox.append(words[1:])
+                #image = np.ravel(image)  #Reshape image into columnvector
+                images.append(image) # Append image to dataset
+                y.append(class_id)
         os.chdir(owd) # Reset to original path
 
     X = np.array(images)
@@ -71,17 +74,19 @@ def load_val_set(path, Image):
         words = line.split()
         image_file = words[0]
         
-        img = Image.open(images_path + image_file).convert('L') # Read image and convert to grayscale
+        #img = Image.open(images_path + image_file).convert('L') # Read image and convert to grayscale
+        img = Image.open(images_path + image_file)
         image = np.array(img)
         
         #image_cropped = crop_image(image, words[2:])
-        
-        y.append(words[1])
-        bbox.append(words[2:])
 
-        image = np.ravel(image) # Convert the image to a columnvector
+        #image = np.ravel(image) # Convert the image to a columnvector
         #print image_file, image.shape
-        images.append(image)
+        if image.ndim == 3:
+            y.append(words[1])
+            bbox.append(words[2:])
+            images.append(image)
+
 
     X = np.array(images)
     y = np.array(y)
@@ -116,8 +121,8 @@ def generate_dataset(num_train, num_val):
     X_train, y_train, train_box = load_training_set(train_path, wnids, Image)
     X_val, y_val, val_box = load_val_set(val_path, Image)
 
-    print "X_val shape: ", X_val.shape
-    print "X_train shape: ", X_train.shape
+    print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
+    print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
     
     save_dataset("train_set.h5", X_train[:num_train], y_train[:num_train])
     save_dataset("val_set.h5", X_val[:num_val], y_val[:num_val])
@@ -127,5 +132,5 @@ def generate_dataset(num_train, num_val):
 
 
 if __name__ == "__main__":
-    generate_dataset(20000, 5000)
+    generate_dataset(5000, 500)
 
