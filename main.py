@@ -66,7 +66,7 @@ def test_network(X_test, y_test, val_fn):
     print("  test accuracy:\t\t{:.2f} %".format(
         test_acc / test_batches * 100))
 
-def build_parameter_update(network, loss, params):
+def build_parameter_update(network, loss):
     # create parameter update expressions
     params = lasagne.layers.get_all_params(network, trainable=True)
     updates = lasagne.updates.nesterov_momentum(loss, params, learning_rate=0.01,
@@ -113,7 +113,7 @@ def main(num_epochs=500):
     loss = build_loss(network, target_var)
 
     # create parameter update expressions
-    updates = build_parameter_update(network, loss, params)
+    updates = build_parameter_update(network, loss)
 
     # Create a loss expression for validation/testing.
     test_loss, test_acc = build_test_loss(network, target_var)
