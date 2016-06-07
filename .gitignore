@@ -11,6 +11,7 @@
 *.py~
 !main.py
 !preprocess.py
+!vgg16.py
 
 # Include everything within the code folder
 !rapport/
