@@ -4,6 +4,7 @@ import theano
 import theano.tensor as T
 import vgg16
 import pickle
+import time
 
 from preprocess import load_dataset
 
@@ -28,6 +29,7 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         start_time = time.time()
         for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
             inputs, targets = batch
+            print inputs, targets
             train_err += train_fn(inputs, targets)
             train_batches += 1
 
@@ -66,7 +68,7 @@ def test_network(X_test, y_test, val_fn):
     print("  test accuracy:\t\t{:.2f} %".format(
         test_acc / test_batches * 100))
 
-def build_parameter_update(network, loss, params):
+def build_parameter_update(network, loss):
     # create parameter update expressions
     params = lasagne.layers.get_all_params(network, trainable=True)
     updates = lasagne.updates.nesterov_momentum(loss, params, learning_rate=0.01,
@@ -99,27 +101,32 @@ def build_test_loss(network, target_var):
 def main(num_epochs=500):
     print("Loading data...")
     X_train, y_train, X_val, y_val = load_dataset()
+
+    print "X_train: ", X_train.shape, " y_train: ", y_train.shape
+    print "X_val: ", X_val.shape, " y_val: ", y_val.shape
     
     input_var = T.tensor4('inputs')
     target_var = T.ivector('targets')
 
     print("Building network...")
-    network = vgg16.build_model()
+    network = vgg16.build_model(input_var)
 
     # Create a loss expression for training
     loss = build_loss(network, target_var)
 
     # create parameter update expressions
-    updates = build_parameter_update(network, loss, params)
+    updates = build_parameter_update(network, loss)
 
     # Create a loss expression for validation/testing.
     test_loss, test_acc = build_test_loss(network, target_var)
     
     # Compile a function performing a training step on a mini-batch (by giving
     # the updates dictionary) and returning the corresponding training loss:
+    print("Setting training function...")
     train_fn = theano.function([input_var, target_var], loss, updates=updates)
 
     # Compile a second function computing the validation loss and accuracy:
+    print("Setting validation function for loss and accuracy...")
     val_fn = theano.function([input_var, target_var], [test_loss, test_acc])
 
     # Finally, launch the training loop.

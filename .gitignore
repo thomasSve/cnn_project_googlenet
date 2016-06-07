@@ -1,16 +1,21 @@
 # Ignore everything
 *
 
-# Include Code-folder
-!code/
-
-# Include everything within the code folder
-!code/*
 
 *.py[cod]
 *.py~
 !main.py
 !preprocess.py
+!vgg16.py
+!gpu_check.py
+
+!cuda/
+!cuda/*
+!cuda/include/*
+!cuda/lib64/*
+
+!preprocessed_data/
+!preprocessed_data/*
 
 # Include everything within the code folder
 !rapport/
