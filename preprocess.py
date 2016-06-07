@@ -56,7 +56,7 @@ def load_training_set(path, wnids, Image):
                 y.append(class_id)
         os.chdir(owd) # Reset to original path
 
-    X = np.array(images)
+    X = np.array(images, dtype=np.uint8)
     y = np.array(y)
     bbox = np.array(bbox)
         
@@ -88,7 +88,7 @@ def load_val_set(path, Image):
             images.append(image)
 
 
-    X = np.array(images)
+    X = np.array(images, dtype=np.uint8)
     y = np.array(y)
     bbox = np.array(bbox)
     
@@ -118,7 +118,10 @@ def generate_dataset(num_train, num_val):
     wnids = [line.strip() for line in open(wnid_file)]
     print "Classes: ", len(wnids)
 
+    print "Loading training set"
     X_train, y_train, train_box = load_training_set(train_path, wnids, Image)
+
+    print "Loading validation set"
     X_val, y_val, val_box = load_val_set(val_path, Image)
 
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape

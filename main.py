@@ -29,6 +29,7 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         start_time = time.time()
         for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
             inputs, targets = batch
+            print inputs, targets
             train_err += train_fn(inputs, targets)
             train_batches += 1
 
