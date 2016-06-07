@@ -99,6 +99,9 @@ def build_test_loss(network, target_var):
 def main(num_epochs=500):
     print("Loading data...")
     X_train, y_train, X_val, y_val = load_dataset()
+
+    print "X_train: ", X_train.shape, " y_train: ", y_train.shape
+    print "X_val: ", X_val.shape, " y_val: ", y_val.shape
     
     input_var = T.tensor4('inputs')
     target_var = T.ivector('targets')
