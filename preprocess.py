@@ -2,6 +2,8 @@ import numpy as np
 import h5py
 
 tiny_imagenet = "http://pages.ucsd.edu/~ztu/courses/tiny-imagenet-200.zip"
+wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
+wnids = [line.strip() for line in open(wnid_file)]
 
 def crop_image(image, box):
     # xmin, ymin, xmax, ymax
@@ -33,13 +35,14 @@ def save_dataset(filename, X, y = None):
         with h5py.File("preprocessed_data/" + filename, 'w') as hf:
             hf.create_dataset('X', data=X)
 
-def load_training_set(path, wnids, Image):
+def load_training_set(path, Image):
     import glob, os
     owd = os.getcwd() # Get original path
 
     images = []
     y = []
     bbox = []
+    i = 0
     for class_id in wnids:
         bbox_file = path + class_id + "/" + class_id + "_boxes.txt"
         for line  in open(bbox_file):
@@ -53,7 +56,8 @@ def load_training_set(path, wnids, Image):
                 bbox.append(words[1:])
                 #image = np.ravel(image)  #Reshape image into columnvector
                 images.append(image) # Append image to dataset
-                y.append(class_id)
+                y.append(i)
+        i = i + 1
         os.chdir(owd) # Reset to original path
 
     X = np.array(images, dtype=np.uint8)
@@ -61,6 +65,9 @@ def load_training_set(path, wnids, Image):
     bbox = np.array(bbox)
         
     return X, y, bbox
+
+def find_label(class_id):
+    return next(i for i in xrange(len(wnids)) if class_id == wnids[i])
 
 def load_val_set(path, Image):
     val_annotations = path + "val_annotations.txt"
@@ -77,13 +84,12 @@ def load_val_set(path, Image):
         #img = Image.open(images_path + image_file).convert('L') # Read image and convert to grayscale
         img = Image.open(images_path + image_file)
         image = np.array(img)
-        
         #image_cropped = crop_image(image, words[2:])
 
         #image = np.ravel(image) # Convert the image to a columnvector
         #print image_file, image.shape
         if image.ndim == 3:
-            y.append(words[1])
+            y.append(find_label(words[1]))
             bbox.append(words[2:])
             images.append(image)
 
@@ -117,9 +123,9 @@ def generate_dataset(num_train, num_val):
 
     wnids = [line.strip() for line in open(wnid_file)]
     print "Classes: ", len(wnids)
-
+    
     print "Loading training set"
-    X_train, y_train, train_box = load_training_set(train_path, wnids, Image)
+    X_train, y_train, train_box = load_training_set(train_path, Image)
 
     print "Loading validation set"
     X_val, y_val, val_box = load_val_set(val_path, Image)
