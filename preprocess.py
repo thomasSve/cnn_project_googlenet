@@ -11,14 +11,12 @@ def crop_image(image, box):
 
 def load_dataset():
     with h5py.File('preprocessed_data/train_set.h5','r') as hf:
-        print('List of arrays in this file: \n', hf.keys())
         X = hf.get('X')
         X_train = np.array(X)
         y = hf.get('y')
         y_train = np.array(y)
         
     with h5py.File('preprocessed_data/val_set.h5','r') as hf:
-        print('List of arrays in this file: \n', hf.keys())
         X = hf.get('X')
         X_val = np.array(X)
         y = hf.get('y')
