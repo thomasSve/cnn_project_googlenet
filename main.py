@@ -5,7 +5,7 @@ import theano.tensor as T
 import vgg16
 import pickle
 
-from preprocess import generate_dataset
+from preprocess import load_dataset
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     assert len(inputs) == len(targets)
