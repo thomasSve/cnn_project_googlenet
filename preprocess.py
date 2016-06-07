@@ -1,5 +1,4 @@
 import numpy as np
-import Image
 import h5py
 
 tiny_imagenet = "http://pages.ucsd.edu/~ztu/courses/tiny-imagenet-200.zip"
@@ -36,7 +35,7 @@ def save_dataset(filename, X, y = None):
         with h5py.File("preprocessed_data/" + filename, 'w') as hf:
             hf.create_dataset('X', data=X)
 
-def load_training_set(path, wnids):
+def load_training_set(path, wnids, Image):
     import glob, os
     owd = os.getcwd() # Get original path
 
@@ -62,7 +61,7 @@ def load_training_set(path, wnids):
         
     return X, y, bbox
 
-def load_val_set(path):
+def load_val_set(path, Image):
     val_annotations = path + "val_annotations.txt"
     images_path = path + "images/"
 
@@ -106,7 +105,7 @@ def load_test_set(test_path):
     return np.array(images)
 
 def generate_dataset(num_train, num_val):
-    
+    import Image
     print("Generating dataset...")
     train_path = "/home/thomas/data/dataset/tiny-imagenet-200/train/"
     val_path = "/home/thomas/data/dataset/tiny-imagenet-200/val/"
@@ -116,8 +115,8 @@ def generate_dataset(num_train, num_val):
     wnids = [line.strip() for line in open(wnid_file)]
     print "Classes: ", len(wnids)
 
-    X_train, y_train, train_box = load_training_set(train_path, wnids)
-    X_val, y_val, val_box = load_val_set(val_path)
+    X_train, y_train, train_box = load_training_set(train_path, wnids, Image)
+    X_val, y_val, val_box = load_val_set(val_path, Image)
 
     print "X_val shape: ", X_val.shape
     print "X_train shape: ", X_train.shape
