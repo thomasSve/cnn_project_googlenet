@@ -24,8 +24,8 @@ def load_dataset():
     val_set = np.load("preprocessed_data/val_set.npz")
     X_val, y_val = val_set['X'], val_set['y']
     
-    test_set = np.load("preprocessed_data/test_set.npz")
-    X_test, y_test = test_set['X']
+    #test_set = np.load("preprocessed_data/test_set.npz")
+    #X_test, y_test = test_set['X']
     
     return X_train, y_train, X_val, y_val
 
@@ -71,7 +71,7 @@ def load_val_set(path):
         y.append(words[1])
         bbox.append(words[2:])
         
-        cropped_image = crop_image(image, words[2:])
+        #cropped_image = crop_image(image, words[2:])
         
         images.append(np.ravel(image))
 
@@ -99,12 +99,11 @@ def generate_dataset():
     wnids = [line.strip() for line in open(wnid_file)]
     print len(wnids)
     
-    #X_train, y_train, train_box = load_training_set(train_path, wnids)
+    X_train, y_train, train_box = load_training_set(train_path, wnids)
     X_val, y_val, val_box = load_val_set(val_path)
     #test_set = load_test_set(test_path)
 
     # crop_images(X_train, train_box)
-    crop_images(X_val, val_box)
     
     # Save the generated arrays
     print("Saving dataset...")
