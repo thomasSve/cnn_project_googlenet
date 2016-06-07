@@ -2,8 +2,6 @@ import numpy as np
 import h5py
 
 tiny_imagenet = "http://pages.ucsd.edu/~ztu/courses/tiny-imagenet-200.zip"
-wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
-wnids = [line.strip() for line in open(wnid_file)]
 
 def crop_image(image, box):
     # xmin, ymin, xmax, ymax
@@ -14,15 +12,15 @@ def crop_image(image, box):
 def load_dataset():
     with h5py.File('preprocessed_data/train_set.h5','r') as hf:
         X = hf.get('X')
-        X_train = np.array(X)
+        X_train = np.array(X, dtype=np.uint8)
         y = hf.get('y')
-        y_train = np.array(y)
+        y_train = np.array(y, dtype=np.uint8)
         
     with h5py.File('preprocessed_data/val_set.h5','r') as hf:
         X = hf.get('X')
-        X_val = np.array(X)
+        X_val = np.array(X, dtype=np.uint8)
         y = hf.get('y')
-        y_val = np.array(y)
+        y_val = np.array(y, dtype=np.uint8)
         
     return X_train, y_train, X_val, y_val
 
@@ -35,7 +33,7 @@ def save_dataset(filename, X, y = None):
         with h5py.File("preprocessed_data/" + filename, 'w') as hf:
             hf.create_dataset('X', data=X)
 
-def load_training_set(path, Image):
+def load_training_set(path, Image, wnids):
     import glob, os
     owd = os.getcwd() # Get original path
 
@@ -43,6 +41,7 @@ def load_training_set(path, Image):
     y = []
     bbox = []
     i = 0
+    
     for class_id in wnids:
         bbox_file = path + class_id + "/" + class_id + "_boxes.txt"
         for line  in open(bbox_file):
@@ -55,6 +54,7 @@ def load_training_set(path, Image):
             if image.ndim == 3:
                 bbox.append(words[1:])
                 #image = np.ravel(image)  #Reshape image into columnvector
+                image = np.rollaxis(image, 2)
                 images.append(image) # Append image to dataset
                 y.append(i)
         i = i + 1
@@ -66,10 +66,10 @@ def load_training_set(path, Image):
         
     return X, y, bbox
 
-def find_label(class_id):
+def find_label(class_id, wnids):
     return next(i for i in xrange(len(wnids)) if class_id == wnids[i])
 
-def load_val_set(path, Image):
+def load_val_set(path, Image, wnids):
     val_annotations = path + "val_annotations.txt"
     images_path = path + "images/"
 
@@ -89,8 +89,9 @@ def load_val_set(path, Image):
         #image = np.ravel(image) # Convert the image to a columnvector
         #print image_file, image.shape
         if image.ndim == 3:
-            y.append(find_label(words[1]))
+            y.append(find_label(words[1], wnids))
             bbox.append(words[2:])
+            image = np.rollaxis(image, 2)
             images.append(image)
 
 
@@ -113,7 +114,7 @@ def load_test_set(test_path):
     
     return np.array(images)
 
-def generate_dataset(num_train, num_val):
+def generate_dataset(num_train, num_val, num_classes):
     import Image
     print("Generating dataset...")
     train_path = "/home/thomas/data/dataset/tiny-imagenet-200/train/"
@@ -122,13 +123,14 @@ def generate_dataset(num_train, num_val):
     wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
 
     wnids = [line.strip() for line in open(wnid_file)]
+    #wnids = wnids[:num_classes]
     print "Classes: ", len(wnids)
     
     print "Loading training set"
-    X_train, y_train, train_box = load_training_set(train_path, Image)
+    X_train, y_train, train_box = load_training_set(train_path, Image, wnids)
 
     print "Loading validation set"
-    X_val, y_val, val_box = load_val_set(val_path, Image)
+    X_val, y_val, val_box = load_val_set(val_path, Image, wnids)
 
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
     print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
@@ -141,5 +143,7 @@ def generate_dataset(num_train, num_val):
 
 
 if __name__ == "__main__":
-    generate_dataset(5000, 500)
-
+    generate_dataset(5000, 500, 10)
+    X_train, y_train, X_val, y_val = load_dataset()
+    print X_train.shape, y_train.shape
+    #print X_val, y_val
