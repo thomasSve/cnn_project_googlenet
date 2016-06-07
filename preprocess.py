@@ -66,10 +66,7 @@ def load_training_set(path, Image, wnids):
         
     return X, y, bbox
 
-def find_label(class_id, wnids):
-    return next(i for i in xrange(len(wnids)) if class_id == wnids[i])
-
-def load_val_set(path, Image, wnids):
+def load_val_set(path, Image):
     val_annotations = path + "val_annotations.txt"
     images_path = path + "images/"
 
@@ -88,7 +85,7 @@ def load_val_set(path, Image, wnids):
         #image = np.ravel(image) # Convert the image to a columnvector
         #print image_file, image.shape
         if image.ndim == 3:
-            y.append(find_label(words[1], wnids))
+            y.append(words[1])
             bbox.append(words[2:])
             image = np.rollaxis(image, 2)
             images.append(image)
@@ -113,7 +110,19 @@ def load_test_set(test_path):
     
     return np.array(images)
 
-def generate_dataset(num_train, num_val, num_classes):
+def split_dataset(X, y, test_size = 0.2, val = False):
+    data = zip(X, y)
+    shuffle(data)
+    X, y = zip(*data)
+
+    if val:
+        split_point = int(floor(len(X)*test_size))
+        return X_train, y_train, X_val, y_val, X_test, y_test
+    else:
+        split_point = int(floor(len(X)*test_size))
+        return X[:split_point], y[:split_point], X[split_point:], y[split_point:]
+        
+def generate_dataset(num_classes = 200):
     import Image
     print("Generating dataset...")
     train_path = "/home/thomas/data/dataset/tiny-imagenet-200/train/"
@@ -122,26 +131,31 @@ def generate_dataset(num_train, num_val, num_classes):
     wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
 
     wnids = [line.strip() for line in open(wnid_file)]
-    #wnids = wnids[:num_classes]
+    wnids = wnids[:num_classes]
     print "Classes: ", len(wnids)
     print "Loading training set"
     X_train, y_train, train_box = load_training_set(train_path, Image, wnids)
 
     print "Loading validation set"
-    X_val, y_val, val_box = load_val_set(val_path, Image, wnids)
-
+    if num_classes = 200:
+        X, y, train_box = load_training_set(train_path, Image, wnids)
+        X_train, y_train, X_test, y_test = split_dataset(X, y, 0.8, 0.2)
+        X_val, y_val, val_box = load_val_set(val_path, Image)
+    else:
+        X, y, boxes = load_training_set(train_path, Image, wnids)
+        X_train, y_train, X_val, y_val = split_dataset(X, y, 0.70, 0.15, 0.15)
+    
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
     print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
     
-    save_dataset("train_set.h5", X_train[:num_train], y_train[:num_train])
-    save_dataset("val_set.h5", X_val[:num_val], y_val[:num_val])
+    save_dataset("train_set.h5", X_train, y_train)
+    save_dataset("val_set.h5", X_val, y_val)
     #save_dataset("test_set", test_set['X'])
     print("Dataset saved")
-
-
+    
 
 if __name__ == "__main__":
-    generate_dataset(5000, 500, 10)
+    generate_dataset(10)
     X_train, y_train, X_val, y_val = load_dataset()
     print X_train.shape, y_train.shape
     #print X_val, y_val
