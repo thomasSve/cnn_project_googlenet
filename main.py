@@ -107,7 +107,7 @@ def main(num_epochs=500):
     target_var = T.ivector('targets')
 
     print("Building network...")
-    network = vgg16.build_model()
+    network = vgg16.build_model(input_var)
 
     # Create a loss expression for training
     loss = build_loss(network, target_var)
