@@ -5,7 +5,7 @@ import theano.tensor as T
 import vgg16
 import pickle
 
-from preprocess import load_dataset
+from preprocess import generate_dataset
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     assert len(inputs) == len(targets)
@@ -98,7 +98,7 @@ def build_test_loss(network, target_var):
 
 def main(num_epochs=500):
     print("Loading data...")
-    X_train, y_train, X_val, y_val = load_dataset()
+    X_train, y_train, X_val, y_val = generate_dataset()
     
     input_var = T.tensor4('inputs')
     target_var = T.ivector('targets')

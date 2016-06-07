@@ -14,6 +14,9 @@
 !cuda/include/*
 !cuda/lib64/*
 
+!preprocessed_data/
+!preprocessed_data/*
+
 # Include everything within the code folder
 !rapport/
 
