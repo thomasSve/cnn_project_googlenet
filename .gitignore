@@ -12,6 +12,8 @@
 !main.py
 !preprocess.py
 !vgg16.py
+!cuda/
+!cuda/*
 
 # Include everything within the code folder
 !rapport/
