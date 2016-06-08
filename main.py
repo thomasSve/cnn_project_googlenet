@@ -3,6 +3,7 @@ import lasagne
 import theano
 import theano.tensor as T
 import vgg16
+import alexnet
 import pickle
 import time
 
@@ -29,7 +30,6 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         start_time = time.time()
         for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
             inputs, targets = batch
-            print inputs, targets
             train_err += train_fn(inputs, targets)
             train_batches += 1
 
@@ -109,8 +109,8 @@ def main(num_epochs=500):
     target_var = T.ivector('targets')
 
     print("Building network...")
-    network = vgg16.build_model(input_var)
-
+    #network = vgg16.build_model(input_var)
+    network = alexnet.build_model(input_var)
     # Create a loss expression for training
     loss = build_loss(network, target_var)
 
