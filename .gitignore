@@ -9,6 +9,8 @@
 !vgg16.py
 !gpu_check.py
 !alexnet.py
+!classify_pretrained.py
+!googlenet.py
 
 !cuda/
 !cuda/*
