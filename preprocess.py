@@ -111,9 +111,10 @@ def load_test_set(test_path):
     images = []
     
     for file in glob.glob("*.JPEG"): # For all images in folder
-        img = Image.open(file).convert('L')
+        img = Image.open(file)
         image = np.array(img)
-        images.append(np.ravel(image))
+        image = np.rollaxis(image, 2)
+        images.append(image)
     os.chdir(owd) # Reset to original path
     
     return np.array(images)
@@ -134,10 +135,10 @@ def split_dataset(X, y, test_size = 0.2, val = False):
         return np.array(X_train), np.array(y_train), np.array(X_test)\
             , np.array(y_test), np.array(X_val), np.array(y_val)
     else:
-        split_point = int(floor(len(X)*test_size))
+        split_point = int(floor(len(X)*(1 - test_size)))
         return X[:split_point], y[:split_point], X[split_point:], y[split_point:]
         
-def generate_dataset(num_classes = 200):
+def generate_dataset(num_classes = 200, save = True):
     import Image
     print("Generating dataset...")
     train_path = "/home/thomas/data/dataset/tiny-imagenet-200/train/"
@@ -162,11 +163,14 @@ def generate_dataset(num_classes = 200):
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
     print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
     print "X_test shape: ", X_test.shape, " y_test shape: ", y_test.shape
-    
-    save_dataset("train_set.h5", X_train, y_train)
-    save_dataset("val_set.h5", X_val, y_val)
-    save_dataset("test_set.h5", X_test, y_test)
-    print("Dataset saved")
+
+    if save:
+        save_dataset("train_set.h5", X_train, y_train)
+        save_dataset("val_set.h5", X_val, y_val)
+        save_dataset("test_set.h5", X_test, y_test)
+        print("Dataset saved")
+    else:
+        return X_train, y_train, X_val, y_val, X_test, y_test
     
 
 if __name__ == "__main__":

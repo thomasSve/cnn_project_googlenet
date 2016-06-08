@@ -3,7 +3,7 @@ import lasagne
 import theano
 import theano.tensor as T
 import vgg16
-import alexnet
+import googlenet
 import pickle
 import time
 
@@ -110,7 +110,7 @@ def main(num_epochs=500):
 
     print("Building network...")
     #network = vgg16.build_model(input_var)
-    network = alexnet.build_model(input_var)
+    network = googlenet.build_model(input_var)
     # Create a loss expression for training
     loss = build_loss(network, target_var)
 
@@ -136,6 +136,14 @@ def main(num_epochs=500):
     # After training, we compute and print the test error:
     print("Starting testing...")
     test_network(X_test, y_test, val_fn)
+
+    # Save network
+    np.savez('trained_alexnet_200.npz', *lasagne.layers.get_all_param_values(network))
+    
+    # And load them again later on like this:
+    # with np.load('model.npz') as f:
+    #     param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+    # lasagne.layers.set_all_param_values(network, param_values)
 
 
 if __name__ == "__main__":
