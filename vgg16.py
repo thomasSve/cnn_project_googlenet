@@ -13,7 +13,7 @@ from lasagne.layers import DropoutLayer
 from lasagne.layers import Pool2DLayer as PoolLayer
 from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer # lasagne.layers.dnn.Conv2DDNNLayer to enforce cuDNN
 # from lasagne.layers import Conv2DLayer as ConvLayer # Default convolution, uses cuDNN if available
-# from lasagne.layers.cuda_convnet import Conv2DCCLayer # for Krizhevsky’s cuda-convnet.
+# from lasagne.layers.cuda_convnet import Conv2DCCLayer # for Krizhevsky's cuda-convnet.
 from lasagne.nonlinearities import softmax
 
 
