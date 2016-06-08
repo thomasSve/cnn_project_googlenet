@@ -1,5 +1,7 @@
 import numpy as np
 import h5py
+from random import shuffle
+from math import floor
 
 tiny_imagenet = "http://pages.ucsd.edu/~ztu/courses/tiny-imagenet-200.zip"
 
@@ -21,8 +23,14 @@ def load_dataset():
         X_val = np.array(X, dtype=np.uint8)
         y = hf.get('y')
         y_val = np.array(y, dtype=np.uint8)
+
+    with h5py.File('preprocessed_data/test_set.h5','r') as hf:
+        X = hf.get('X')
+        X_test = np.array(X, dtype=np.uint8)
+        y = hf.get('y')
+        y_test = np.array(y, dtype=np.uint8)
         
-    return X_train, y_train, X_val, y_val
+    return X_train, y_train, X_val, y_val, X_test, y_test
 
 def save_dataset(filename, X, y = None):
     if y != None:
@@ -116,8 +124,15 @@ def split_dataset(X, y, test_size = 0.2, val = False):
     X, y = zip(*data)
 
     if val:
-        split_point = int(floor(len(X)*test_size))
-        return X_train, y_train, X_val, y_val, X_test, y_test
+        split_point = int(floor(len(X)*(1 - test_size * 2)))
+        X_train, y_train = X[:split_point], y[:split_point]
+        X_test_val, y_test_val = X[split_point:], y[split_point:]
+        split_point = int(floor(len(X_test_val)*0.5))
+        X_test, y_test, X_val, y_val = X_test_val[:split_point], y_test_val[:split_point], \
+                                       X_test_val[split_point:], y_test_val[split_point:]
+
+        return np.array(X_train), np.array(y_train), np.array(X_test)\
+            , np.array(y_test), np.array(X_val), np.array(y_val)
     else:
         split_point = int(floor(len(X)*test_size))
         return X[:split_point], y[:split_point], X[split_point:], y[split_point:]
@@ -137,25 +152,25 @@ def generate_dataset(num_classes = 200):
     X_train, y_train, train_box = load_training_set(train_path, Image, wnids)
 
     print "Loading validation set"
-    if num_classes = 200:
+    if num_classes == 200:
         X, y, train_box = load_training_set(train_path, Image, wnids)
-        X_train, y_train, X_test, y_test = split_dataset(X, y, 0.8, 0.2)
+        X_train, y_train, X_test, y_test = split_dataset(X, y, test_size = 0.2)
         X_val, y_val, val_box = load_val_set(val_path, Image)
     else:
         X, y, boxes = load_training_set(train_path, Image, wnids)
-        X_train, y_train, X_val, y_val = split_dataset(X, y, 0.70, 0.15, 0.15)
-    
+        X_train, y_train, X_test, y_test, X_val, y_val = split_dataset(X, y, test_size = 0.15, val = True)
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
     print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
+    print "X_test shape: ", X_test.shape, " y_test shape: ", y_test.shape
     
     save_dataset("train_set.h5", X_train, y_train)
     save_dataset("val_set.h5", X_val, y_val)
-    #save_dataset("test_set", test_set['X'])
+    save_dataset("test_set.h5", X_test, y_test)
     print("Dataset saved")
     
 
 if __name__ == "__main__":
-    generate_dataset(10)
-    X_train, y_train, X_val, y_val = load_dataset()
-    print X_train.shape, y_train.shape
+    generate_dataset(20)
+    #X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
+    #print X_train.shape, y_train.shape
     #print X_val, y_val

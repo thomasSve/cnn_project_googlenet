@@ -100,7 +100,7 @@ def build_test_loss(network, target_var):
 
 def main(num_epochs=500):
     print("Loading data...")
-    X_train, y_train, X_val, y_val = load_dataset()
+    X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
 
     print "X_train: ", X_train.shape, " y_train: ", y_train.shape
     print "X_val: ", X_val.shape, " y_val: ", y_val.shape
@@ -135,7 +135,7 @@ def main(num_epochs=500):
 
     # After training, we compute and print the test error:
     print("Starting testing...")
-    #test_network(X_test, y_test, val_fn)
+    test_network(X_test, y_test, val_fn)
 
 
 if __name__ == "__main__":
