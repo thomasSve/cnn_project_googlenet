@@ -203,6 +203,7 @@ def find_label(wnids, wnid):
         if line == wnid:
             return i
         i = i + 1
+    return None
 
 def load_zip_val_set(path, wnids, archive):
     X = []
@@ -213,7 +214,8 @@ def load_zip_val_set(path, wnids, archive):
         img = archive.read(path + "images/" + words[0])
         img = Image.open(StringIO(img))
         image = np.array(img)
-        if image.ndim == 3:
+        label = find_label(wnids, words[1])
+        if image.ndim == 3 and label != None:
             #bbox.append(words[2:])
             image = np.rollaxis(image, 2)
             X.append(image) # Append image to dataset
@@ -234,7 +236,8 @@ def generate_url_zip():
     print "Reading from zip..."
     archive = zipfile.ZipFile(zip_url, 'r')
     wnids = [line.strip() for line in archive.open(wnid_file)]
-
+    wnids = wnids[:100]
+    
     print "Loading training set..."
     X, y = load_zip_training_set(train_path, wnids, archive)
 

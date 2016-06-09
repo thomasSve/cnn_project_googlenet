@@ -98,7 +98,7 @@ def build_test_loss(network, target_var):
 
     return test_loss, test_acc
 
-def main(num_epochs=500):
+def main(num_epochs=250):
     print("Loading data...")
     X_train, y_train, X_val, y_val, X_test, y_test = generate_url_zip()
 
