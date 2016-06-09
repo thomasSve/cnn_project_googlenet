@@ -21,7 +21,8 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
             excerpt = slice(start_idx, start_idx + batchsize)
         yield inputs[excerpt], targets[excerpt]
         
-def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
+def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn, network):
+    save_iterals = {0, 49, 99, 199, 249}
     results = []
     # We iterate over epochs:
     for epoch in range(num_epochs):
@@ -54,7 +55,11 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
         print("  validation accuracy:\t\t{:.2f} %".format(val_acc / val_batches * 100))
 
-        results.append(val_acc / val_batches * 100)        
+        results.append(val_acc / val_batches * 100)
+
+        if epoch in save_iterals: # Store the network while training
+            np.savez("epoch_googlenet_100_" + str(epoch + 1) +".npz", *lasagne.layers.get_all_param_values(network))
+        
 
     np.savez('googlenet_epochs.npz', results)
 
@@ -138,7 +143,7 @@ def main(num_epochs=250):
 
     # Finally, launch the training loop.
     print("Starting training...")
-    train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn)
+    train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn, network)
 
     # After training, we compute and print the test error:
     print("Starting testing...")
