@@ -2,6 +2,9 @@ import numpy as np
 import h5py
 from random import shuffle
 from math import floor
+from PIL import Image
+from StringIO import StringIO
+
 
 tiny_imagenet = "http://pages.ucsd.edu/~ztu/courses/tiny-imagenet-200.zip"
 
@@ -72,7 +75,7 @@ def load_training_set(path, Image, wnids):
     y = np.array(y)
     bbox = np.array(bbox)
         
-    return X, y, bbox
+    return X, y
 
 def load_val_set(path, Image):
     val_annotations = path + "val_annotations.txt"
@@ -103,7 +106,7 @@ def load_val_set(path, Image):
     y = np.array(y)
     bbox = np.array(bbox)
     
-    return X, y, bbox
+    return X, y
 
 def load_test_set(test_path):
     import glob, os
@@ -120,6 +123,7 @@ def load_test_set(test_path):
     return np.array(images)
 
 def split_dataset(X, y, test_size = 0.2, val = False):
+    print len(X), len(y)
     data = zip(X, y)
     shuffle(data)
     X, y = zip(*data)
@@ -136,7 +140,8 @@ def split_dataset(X, y, test_size = 0.2, val = False):
             , np.array(y_test), np.array(X_val), np.array(y_val)
     else:
         split_point = int(floor(len(X)*(1 - test_size)))
-        return X[:split_point], y[:split_point], X[split_point:], y[split_point:]
+        return np.array(X[:split_point]), np.array(y[:split_point]), \
+                                                  np.array(X[split_point:]), np.array(y[split_point:])
         
 def generate_dataset(num_classes = 200, save = True):
     import Image
@@ -150,15 +155,15 @@ def generate_dataset(num_classes = 200, save = True):
     wnids = wnids[:num_classes]
     print "Classes: ", len(wnids)
     print "Loading training set"
-    X_train, y_train, train_box = load_training_set(train_path, Image, wnids)
 
-    print "Loading validation set"
     if num_classes == 200:
-        X, y, train_box = load_training_set(train_path, Image, wnids)
+        X, y = load_training_set(train_path, Image, wnids)
         X_train, y_train, X_test, y_test = split_dataset(X, y, test_size = 0.2)
-        X_val, y_val, val_box = load_val_set(val_path, Image)
+        print "Loading validation set"
+
+        X_val, y_val = load_val_set(val_path, Image)
     else:
-        X, y, boxes = load_training_set(train_path, Image, wnids)
+        X, y = load_training_set(train_path, Image, wnids)
         X_train, y_train, X_test, y_test, X_val, y_val = split_dataset(X, y, test_size = 0.15, val = True)
     print "X_val shape: ", X_val.shape, " y_val shape: ", y_val.shape
     print "X_train shape: ", X_train.shape, " y_train shape: ", y_train.shape
@@ -171,10 +176,79 @@ def generate_dataset(num_classes = 200, save = True):
         print("Dataset saved")
     else:
         return X_train, y_train, X_val, y_val, X_test, y_test
-    
 
+def load_zip_training_set(path, wnids, archive):
+    X = []
+    y = []
+    i = 0
+    for class_id in wnids:
+        bbox_file = path + class_id + "/" + class_id + "_boxes.txt"
+        for line  in archive.open(bbox_file):
+            words = line.split()
+            img = archive.read(path + class_id + "/images/" + words[0])
+            img = Image.open(StringIO(img)) 
+            image = np.array(img)
+            if image.ndim == 3:
+                #bbox.append(words[1:])
+                image = np.rollaxis(image, 2)
+                X.append(image) # Append image to dataset
+                y.append(i)
+        i = i + 1
+
+    return np.array(X), np.array(y)
+
+def find_label(wnids, wnid):
+    i = 0
+    for line in wnids:
+        if line == wnid:
+            return i
+        i = i + 1
+
+def load_zip_val_set(path, wnids, archive):
+    X = []
+    y = []
+    val_annotations = path + "val_annotations.txt"    
+    for line in archive.open(val_annotations):
+        words = line.split()
+        img = archive.read(path + "images/" + words[0])
+        img = Image.open(StringIO(img))
+        image = np.array(img)
+        if image.ndim == 3:
+            #bbox.append(words[2:])
+            image = np.rollaxis(image, 2)
+            X.append(image) # Append image to dataset
+            y.append(find_label(wnids, words[1]))
+            
+    return np.array(X), np.array(y)
+
+def generate_url_zip():
+    import zipfile
+    
+    zip_url = "tiny-imagenet-200.zip"
+    train_path = "tiny-imagenet-200/train/"
+    val_path = "tiny-imagenet-200/val/"
+    test_path = "tiny-imagenet-200/test/"
+    wnid_file = "tiny-imagenet-200/wnids.txt"
+
+    
+    print "Reading from zip..."
+    archive = zipfile.ZipFile(zip_url, 'r')
+    wnids = [line.strip() for line in archive.open(wnid_file)]
+
+    print "Loading training set..."
+    X, y = load_zip_training_set(train_path, wnids, archive)
+
+    print "Loading validation set.."
+    X_val, y_val = load_zip_val_set(val_path, wnids, archive)
+
+    X_train, y_train, X_test, y_test =  split_dataset(X, y, test_size = 0.2)
+    print(X_train.shape, y_train.shape, X_val.shape, y_val.shape, X_test.shape, y_test.shape)
+    
+    return X_train, y_train, X_val, y_val, X_test, y_test
+    
 if __name__ == "__main__":
-    generate_dataset(20)
+    generate_url_zip()
+    #generate_dataset(20)
     #X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
     #print X_train.shape, y_train.shape
     #print X_val, y_val

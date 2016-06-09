@@ -13,8 +13,8 @@ def load_pickle_googlenet():
     return output_layer
 
 def load_network():
-    network = alexnet.build_model()
-    with np.load('model.npz') as f:
+    network = googlenet.build_model()
+    with np.load('trained_alexnet_200.npz') as f:
         param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     lasagne.layers.set_all_param_values(network, param_values)
     return network
@@ -47,16 +47,19 @@ def print_predictions(images, images_raw, network, classes):
             top5 = np.argsort(prob[0])[-1:-6:-1]
 
             plt.figure()
-            plt.imshow(image_raw.astype('uint8'))
+            plt.imread(image_raw.astype('uint8'))
             plt.axis('off')
             for n, label in enumerate(top5):
                 plt.text(250, 70 + n * 20, '{}. {}'.format(n+1, classes[label]), fontsize=14)
+
+            plt.save("predicted_" + str(i) + ".JPEG")
+            i = i + 1
                 
 def main():
     wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
     
-    #network = load_network()
-    network = load_pickle_googlenet()
+    network = load_network()
+    #network = load_pickle_googlenet()
     images, images_raw = random_test_images()
     classes = load_classes(wnid_file)
     print_predictions(images, images_raw, network, classes)
