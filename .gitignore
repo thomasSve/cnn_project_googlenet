@@ -6,6 +6,7 @@
 *.py~
 !main.py
 !preprocess.py
+!preprocess_zip.py
 !vgg16.py
 !gpu_check.py
 !alexnet.py
