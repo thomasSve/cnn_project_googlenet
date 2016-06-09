@@ -30,11 +30,14 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         train_err = 0
         train_batches = 0
         start_time = time.time()
+
+        print("   pass over training data...")
         for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
             inputs, targets = batch
             train_err += train_fn(inputs, targets)
             train_batches += 1
 
+        print("   pass over validation data...")
         # And a full pass over the validation data:
         val_err = 0
         val_acc = 0
