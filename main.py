@@ -21,7 +21,7 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
             excerpt = slice(start_idx, start_idx + batchsize)
         yield inputs[excerpt], targets[excerpt]
         
-def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
+def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn, network):
     save_iterals = {0, 49, 99, 199, 249}
     results = []
     # We iterate over epochs:
@@ -30,11 +30,14 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         train_err = 0
         train_batches = 0
         start_time = time.time()
+
+        print("   pass over training data...")
         for batch in iterate_minibatches(X_train, y_train, 500, shuffle=True):
             inputs, targets = batch
             train_err += train_fn(inputs, targets)
             train_batches += 1
 
+        print("   pass over validation data...")
         # And a full pass over the validation data:
         val_err = 0
         val_acc = 0
@@ -140,7 +143,7 @@ def main(num_epochs=250):
 
     # Finally, launch the training loop.
     print("Starting training...")
-    train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn)
+    train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn, network)
 
     # After training, we compute and print the test error:
     print("Starting testing...")
