@@ -7,7 +7,7 @@ import googlenet
 import pickle
 import time
 
-from preprocess import load_dataset
+from preprocess import load_dataset, generate_url_zip
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     assert len(inputs) == len(targets)
@@ -100,7 +100,7 @@ def build_test_loss(network, target_var):
 
 def main(num_epochs=500):
     print("Loading data...")
-    X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
+    X_train, y_train, X_val, y_val, X_test, y_test = generate_url_zip()
 
     print "X_train: ", X_train.shape, " y_train: ", y_train.shape
     print "X_val: ", X_val.shape, " y_val: ", y_val.shape
