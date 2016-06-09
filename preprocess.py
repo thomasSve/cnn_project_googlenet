@@ -72,7 +72,7 @@ def load_training_set(path, Image, wnids):
         os.chdir(owd) # Reset to original path
 
     X = np.array(images, dtype=np.uint8)
-    y = np.array(y)
+    y = np.array(y, dtype=np.uint8)
     bbox = np.array(bbox)
         
     return X, y
@@ -195,7 +195,7 @@ def load_zip_training_set(path, wnids, archive):
                 y.append(i)
         i = i + 1
 
-    return np.array(X), np.array(y)
+    return np.array(X, dtype=np.uint8), np.array(y, dtype=np.uint8)
 
 def find_label(wnids, wnid):
     i = 0
@@ -219,7 +219,7 @@ def load_zip_val_set(path, wnids, archive):
             X.append(image) # Append image to dataset
             y.append(find_label(wnids, words[1]))
             
-    return np.array(X), np.array(y)
+    return np.array(X, dtype=np.uint8), np.array(y, dtype=np.uint8)
 
 def generate_url_zip():
     import zipfile
@@ -242,9 +242,9 @@ def generate_url_zip():
     X_val, y_val = load_zip_val_set(val_path, wnids, archive)
 
     X_train, y_train, X_test, y_test =  split_dataset(X, y, test_size = 0.2)
-    print(X_train.shape, y_train.shape, X_val.shape, y_val.shape, X_test.shape, y_test.shape)
-    
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    print(X_train.shape, y_train.shape, X_val.shape, y_val.shape, X_test.shape, y_test.shape)    
+
+    return X_train.astype(np.uint8), y_train.astype(np.uint8), X_val.astype(np.uint8), y_val.astype(np.uint8), X_test.astype(np.uint8), y_test.astype(np.uint8)
     
 if __name__ == "__main__":
     generate_url_zip()
