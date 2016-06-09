@@ -52,7 +52,7 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
         print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
         print("  validation accuracy:\t\t{:.2f} %".format(val_acc / val_batches * 100))
 
-        results.append("Epoch {} of {} took {:.3f}s, validation accuracy:\t\t{:.2f} ".format(epoch + 1, num_epochs, time.time() - start_time), (val_acc / val_batches * 100))
+        results.append(val_acc / val_batches * 100)
 
         if epoch in save_iterals: # Store the network while training
             np.savez("epoch_googlenet_100_" + str(epoch + 1) +".npz", *lasagne.layers.get_all_param_values(network))
