@@ -23,20 +23,15 @@ def build_inception_module(name, input_layer, nfilters):
     # nfilters: (pool_proj, 1x1, 3x3_reduce, 3x3, 5x5_reduce, 5x5)
     net = {}
     net['pool'] = PoolLayerDNN(input_layer, pool_size=3, stride=1, pad=1)
-    net['pool_proj'] = ConvLayer(
-        net['pool'], nfilters[0], 1, flip_filters=False)
+    net['pool_proj'] = ConvLayer(net['pool'], nfilters[0], 1, flip_filters=False)
 
     net['1x1'] = ConvLayer(input_layer, nfilters[1], 1, flip_filters=False)
 
-    net['3x3_reduce'] = ConvLayer(
-        input_layer, nfilters[2], 1, flip_filters=False)
-    net['3x3'] = ConvLayer(
-        net['3x3_reduce'], nfilters[3], 3, pad=1, flip_filters=False)
+    net['3x3_reduce'] = ConvLayer(input_layer, nfilters[2], 1, flip_filters=False)
+    net['3x3'] = ConvLayer(net['3x3_reduce'], nfilters[3], 3, pad=1, flip_filters=False)
 
-    net['5x5_reduce'] = ConvLayer(
-        input_layer, nfilters[4], 1, flip_filters=False)
-    net['5x5'] = ConvLayer(
-        net['5x5_reduce'], nfilters[5], 5, pad=2, flip_filters=False)
+    net['5x5_reduce'] = ConvLayer(input_layer, nfilters[4], 1, flip_filters=False)
+    net['5x5'] = ConvLayer(net['5x5_reduce'], nfilters[5], 5, pad=2, flip_filters=False)
 
     net['output'] = ConcatLayer([
         net['1x1'],
@@ -51,18 +46,13 @@ def build_inception_module(name, input_layer, nfilters):
 def build_model(input_var = None):
     net = {}
     net['input'] = InputLayer((None, 3, None, None), input_var = input_var)
-    net['conv1/7x7_s2'] = ConvLayer(
-        net['input'], 64, 7, stride=2, pad=3, flip_filters=False)
-    net['pool1/3x3_s2'] = PoolLayer(
-        net['conv1/7x7_s2'], pool_size=3, stride=2, ignore_border=False)
+    net['conv1/7x7_s2'] = ConvLayer(net['input'], 64, 7, stride=2, pad=3, flip_filters=False)
+    net['pool1/3x3_s2'] = PoolLayer(net['conv1/7x7_s2'], pool_size=3, stride=2, ignore_border=False)
     net['pool1/norm1'] = LRNLayer(net['pool1/3x3_s2'], alpha=0.00002, k=1)
-    net['conv2/3x3_reduce'] = ConvLayer(
-        net['pool1/norm1'], 64, 1, flip_filters=False)
-    net['conv2/3x3'] = ConvLayer(
-        net['conv2/3x3_reduce'], 192, 3, pad=1, flip_filters=False)
+    net['conv2/3x3_reduce'] = ConvLayer(net['pool1/norm1'], 64, 1, flip_filters=False)
+    net['conv2/3x3'] = ConvLayer(net['conv2/3x3_reduce'], 192, 3, pad=1, flip_filters=False)
     net['conv2/norm2'] = LRNLayer(net['conv2/3x3'], alpha=0.00002, k=1)
-    net['pool2/3x3_s2'] = PoolLayer(
-      net['conv2/norm2'], pool_size=3, stride=2, ignore_border=False)
+    net['pool2/3x3_s2'] = PoolLayer(net['conv2/norm2'], pool_size=3, stride=2, ignore_border=False)
 
     net.update(build_inception_module('inception_3a',
                                       net['pool2/3x3_s2'],
@@ -70,8 +60,7 @@ def build_model(input_var = None):
     net.update(build_inception_module('inception_3b',
                                       net['inception_3a/output'],
                                       [64, 128, 128, 192, 32, 96]))
-    net['pool3/3x3_s2'] = PoolLayer(
-      net['inception_3b/output'], pool_size=3, stride=2, ignore_border=False)
+    net['pool3/3x3_s2'] = PoolLayer(net['inception_3b/output'], pool_size=3, stride=2, ignore_border=False)
 
     net.update(build_inception_module('inception_4a',
                                       net['pool3/3x3_s2'],
@@ -88,8 +77,7 @@ def build_model(input_var = None):
     net.update(build_inception_module('inception_4e',
                                       net['inception_4d/output'],
                                       [128, 256, 160, 320, 32, 128]))
-    net['pool4/3x3_s2'] = PoolLayer(
-      net['inception_4e/output'], pool_size=3, stride=2, ignore_border=False)
+    net['pool4/3x3_s2'] = PoolLayer(net['inception_4e/output'], pool_size=3, stride=2, ignore_border=False)
 
     net.update(build_inception_module('inception_5a',
                                       net['pool4/3x3_s2'],
