@@ -22,8 +22,12 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
         yield inputs[excerpt], targets[excerpt]
         
 def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
+    save_iterals = {50, 100, 200, 250}
+    results = []
     # We iterate over epochs:
     for epoch in range(num_epochs):
+        if epoch in save_iterals:
+            np.savez("", *lasagne.layers.get_all_param_values(network))
         # In each epoch, we do a full pass over the training data:
         train_err = 0
         train_batches = 0
@@ -45,13 +49,17 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn):
             val_batches += 1
 
         # Then we print the results for this epoch:
-        print("Epoch {} of {} took {:.3f}s".format(
-            epoch + 1, num_epochs, time.time() - start_time))
+        print("Epoch {} of {} took {:.3f}s".format(epoch + 1, num_epochs, time.time() - start_time))
         print("  training loss:\t\t{:.6f}".format(train_err / train_batches))
         print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
-        print("  validation accuracy:\t\t{:.2f} %".format(
-            val_acc / val_batches * 100))
+        print("  validation accuracy:\t\t{:.2f} %".format(val_acc / val_batches * 100))
 
+        results.append("Epoch {} of {} took {:.3f}s, validation accuracy:\t\t{:.2f} ".format(epoch + 1, num_epochs, time.time() - start_time), (val_acc / val_batches * 100))
+        
+
+    np.savez('googlenet_epochs.npz', results)
+
+        
             
 def test_network(X_test, y_test, val_fn):
     test_err = 0
@@ -138,7 +146,7 @@ def main(num_epochs=250):
     test_network(X_test, y_test, val_fn)
 
     # Save network
-    np.savez('trained_alexnet_200.npz', *lasagne.layers.get_all_param_values(network))
+    np.savez('trained_googlenet_100.npz', *lasagne.layers.get_all_param_values(network))
     
     # And load them again later on like this:
     # with np.load('model.npz') as f:
