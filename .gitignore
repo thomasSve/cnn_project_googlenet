@@ -25,6 +25,8 @@
 
 rapport/*
 !rapport/cnn_project_rapport.pdf
+!rapport/jmlr2e.sty
+!rapport/cnn_project_rapport.tex
 
 # Include README.md
 !README.md
