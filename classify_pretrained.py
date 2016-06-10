@@ -84,6 +84,14 @@ def save_predictions(images, images_raw, network, classes, classes_words):
     
                 
 def main():
+    with load('googlenet_epochs.npz') as data:
+        results = data['results']
+
+    epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
+    for i in epoch_print:
+        print "Results, epoch " + str(i) + ": " + str(results[i - 1])
+
+        
     zip_url = "tiny-imagenet-200.zip"
     wnid_file = "tiny-imagenet-200/wnids.txt"
     test_path = "tiny-imagenet-200/test/"
@@ -109,12 +117,7 @@ def main():
     classes = load_classes(wnid_file, archive)
     save_predictions(X, X_raw, network, classes, classes_words)
 
-    with load('googlenet_epochs.npz') as data:
-        results = data['results']
 
-    epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
-    for i in epoch_print:
-        print "Results, epoch " + str(i) + ": " + str(results[i - 1])
     
 if __name__=="__main__":
     main()
