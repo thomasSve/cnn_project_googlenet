@@ -53,9 +53,9 @@ def load_images(path, wnids, archive):
         img = Image.open(StringIO(img))
         image = np.array(img)
         if image.ndim == 3:
-            X_raw.append(image)
+            X_raw.append(np.copy(image).astype('uint8'))
             image = np.rollaxis(image, 2)
-            X.append(image) # Append image to dataset
+            X.append(floatX(image[np.newaxis])) # Append image to dataset
             
     return np.array(X), np.array(X_raw)
 
