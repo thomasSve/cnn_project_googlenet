@@ -12,6 +12,7 @@
 !alexnet.py
 !classify_pretrained.py
 !googlenet.py
+!predictions.npz
 
 !cuda/
 !cuda/*
