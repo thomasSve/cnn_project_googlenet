@@ -121,8 +121,8 @@ def main():
     X, X_raw = load_images(val_path, wnids, archive)
 
     data = zip(X, X_raw)
-    shuffled = np.random.shuffle(data)
-    data = shuffled[:5]
+    np.random.shuffle(data)
+    data = data[:5]
     X, X_raw = zip(*data)
         
     classes = load_classes(wnid_file, archive)
