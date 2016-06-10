@@ -53,7 +53,7 @@ def load_images(path, wnids, archive):
             image = np.rollaxis(image, 2)
             X.append(image) # Append image to dataset
             
-    return np.array(X, dtype=np.uint8), np.array(X_raw, dtype=np.uint8)
+    return np.array(X), np.array(X_raw)
 
 def random_test_images(image_urls, num_samples = 5):
     np.random.seed(23)
