@@ -107,7 +107,7 @@ def main():
     X, X_raw = zip(*data)
         
     classes = load_classes(wnid_file, archive)
-    print_predictions(X, X_raw, network, classes, classes_words)
+    save_predictions(X, X_raw, network, classes, classes_words)
 
     with load('googlenet_epochs.npz') as data:
         results = data['results']
