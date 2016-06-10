@@ -6,6 +6,7 @@
 *.py~
 !main.py
 !preprocess.py
+!preprocess_zip.py
 !vgg16.py
 !gpu_check.py
 !alexnet.py
@@ -25,6 +26,10 @@
 
 rapport/*
 !rapport/cnn_project_rapport.pdf
+!rapport/jmlr2e.sty
+!rapport/cnn_project_rapport.tex
+!rapport/images/
+!rapport/images/cnn_embed_1k.jpg
 
 # Include README.md
 !README.md
