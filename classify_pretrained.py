@@ -1,8 +1,8 @@
 import numpy as np
 import lasagne
+from lasagne.utils import floatX
 import googlenet
 import zipfile
-import theano
 from random import shuffle
 from math import floor
 from preprocess_zip import load_zip_val_set
@@ -33,11 +33,14 @@ def load_test_images(image_urls):
     
     for url in image_urls:
         img = Image.open(url)
-        image = np.array(img)
-        images_raw.append(image)
-        image = np.rollaxis(image)
-        images.append(image)
+        rawim = np.copy(img).astype('uint8')
+
+        images_raw.append(rawim)
         
+        image = np.rollaxis(image)
+        images.append(floatX(image[np.newaxis]))
+
+    
     return images, images_raw
 
 def load_images(path, wnids, archive):
@@ -82,8 +85,9 @@ def save_predictions(images, images_raw, network, classes, classes_words):
         prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
         top5.append(np.argsort(prob[0])[-1:-6:-1])
 
-    np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words) 
-    
+    np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words)
+    print "Predictions saved as predictions.npz"
+
                 
 def main():
     #with np.load('googlenet_epochs.npz') as data:
@@ -113,7 +117,7 @@ def main():
     #network = load_pickle_googlenet()
     #images, images_raw = random_test_images()
 
-    print ""
+    print "Loading images"
     X, X_raw = load_images(val_path, wnids, archive)
 
     data = zip(X, X_raw)
@@ -122,6 +126,8 @@ def main():
     X, X_raw = zip(*data)
         
     classes = load_classes(wnid_file, archive)
+
+    print "Making predictions"
     save_predictions(X, X_raw, network, classes, classes_words)
 
 
