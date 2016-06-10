@@ -1,7 +1,14 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import lasagne
+from lasagne.utils import floatX
 import googlenet
+import zipfile
+from random import shuffle
+from math import floor
+from preprocess_zip import load_zip_val_set
+from PIL import Image
+from StringIO import StringIO
+
 
 def load_pickle_googlenet():
     import pickle
@@ -14,7 +21,7 @@ def load_pickle_googlenet():
 
 def load_network():
     network = googlenet.build_model()
-    with np.load('trained_alexnet_200.npz') as f:
+    with np.load('trained_googlenet_100.npz') as f:
         param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     lasagne.layers.set_all_param_values(network, param_values)
     
@@ -26,13 +33,32 @@ def load_test_images(image_urls):
     
     for url in image_urls:
         img = Image.open(url)
-        image = np.array(img)
-        images_raw.append(image)
+        rawim = np.copy(img).astype('uint8')
+
+        images_raw.append(rawim)
+        
         image = np.rollaxis(image)
-        images.append(image)
-        
+        images.append(floatX(image[np.newaxis]))
+
+    
     return images, images_raw
-        
+
+def load_images(path, wnids, archive):
+    X = []
+    X_raw = []
+    val_annotations = path + "val_annotations.txt"    
+    for line in archive.open(val_annotations):
+        words = line.split()
+        img = archive.read(path + "images/" + words[0])
+        img = Image.open(StringIO(img))
+        image = np.array(img)
+        if image.ndim == 3:
+            X_raw.append(np.copy(image).astype('uint8'))
+            image = np.rollaxis(image, 2)
+            X.append(floatX(image[np.newaxis])) # Append image to dataset
+            
+    return np.array(X), np.array(X_raw)
+
 def random_test_images(image_urls, num_samples = 5):
     np.random.seed(23)
     image_urls = image_urls[:num_samples]
@@ -40,33 +66,71 @@ def random_test_images(image_urls, num_samples = 5):
     
     return images, images_raw
 
-def load_classes(wnid_file):
-    return [line.strip() for line in open(wnid_file)]
+def load_classes_name(wnids, archive):
+    words = "tiny-imagenet-200/words.txt"
+    classes_words = {}
+    for line in archive.open(words):
+        words = line.split()
+        classes_words[words[0]] = words[1]
 
-def print_predictions(images, images_raw, network, classes):
+    return classes_words
+
+def load_classes(wnid_file, archive):
+    return [line.strip() for line in archive.open(wnid_file)]
+
+def save_predictions(images, images_raw, network, classes, classes_words):
+    top5 = []
     for i in range(len(images)):
-            prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
-            top5 = np.argsort(prob[0])[-1:-6:-1]
+        print images[i].shape
+        prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
+        top5.append(np.argsort(prob[0])[-1:-6:-1])
 
-            plt.figure()
-            plt.imread(images_raw[i].astype('uint8'))
-            plt.axis('off')
-            for n, label in enumerate(top5):
-                plt.text(250, 70 + n * 20, '{}. {}'.format(n+1, classes[label]), fontsize=14)
+    np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words)
+    print "Predictions saved as predictions.npz"
 
-            plt.save("predicted_" + str(i) + ".JPEG")
-            print "Saved plot: predicted_" + str(i) + ".JPEG"
-            i = i + 1
                 
 def main():
-    wnid_file = "/home/thomas/data/dataset/tiny-imagenet-200/wnids.txt"
+    #with np.load('googlenet_epochs.npz') as data:
+    #    results = data['results']
+
+    #epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
+    #for i in epoch_print:
+    #    print "Results, epoch " + str(i) + ": " + str(results[i - 1])
+
+        
+    zip_url = "tiny-imagenet-200.zip"
+    wnid_file = "tiny-imagenet-200/wnids.txt"
     test_path = "tiny-imagenet-200/test/"
-    
+    val_path = "tiny-imagenet-200/val/"
+
+
+    print "Reading from zip..."
+    archive = zipfile.ZipFile(zip_url, 'r')
+    wnids = [line.strip() for line in archive.open(wnid_file)] # Load list over classes
+    wnids = wnids[:100] # Load only the 100 first classes
+
+    print "Loading classes"
+    classes_words = load_classes_name(wnids, archive)
+
+    print "Loading network"
     network = load_network()
     #network = load_pickle_googlenet()
-    images, images_raw = random_test_images()
-    classes = load_classes(wnid_file)
-    print_predictions(images, images_raw, network, classes)
+    #images, images_raw = random_test_images()
 
+    print "Loading images"
+    X, X_raw = load_images(val_path, wnids, archive)
+
+    data = zip(X, X_raw)
+    np.random.shuffle(data)
+    data = data[:5]
+    X, X_raw = zip(*data)
+        
+    classes = load_classes(wnid_file, archive)
+
+    print "Making predictions"
+    save_predictions(X, X_raw, network, classes, classes_words)
+
+
+    
 if __name__=="__main__":
     main()
