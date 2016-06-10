@@ -111,12 +111,12 @@ In order to test my program to see if it would run, I first classified a smaller
   \hline
   \# classes & \# training & \# validation & \# testing & \# epoch & test-loss & Accuracy\\ \hline
   20 & 6903 & 1480 & 1480 & 500 & 10.9 & 39.30 \\
-  100 & 39340 & 4928 & 9835 & 250 & & \\
+  100 & 39340 & 4928 & 9835 & 250 & 9.95 & 29.31 \\
   \hline  
 \end{tabular}
 \end{table}
 
-On epoch 50 it was actually lower than epoch 30. Looking closer at the runs, it shows that on epoch 49 and 51 it was around 28 \%, meaning it hasnt really changed since epoch 30, it just dropped a little on the actual round 50. 
+As we can see on the validation accuracy after numbers of epochs, it stopped improved very little after 20 epochs, making it stuck at around 28 \% accuracy. 
 
 \begin{table}[!htbp]
   \centering
@@ -124,16 +124,16 @@ On epoch 50 it was actually lower than epoch 30. Looking closer at the runs, it 
 \begin{tabular}{| l l |}
   \hline
   Epoch & Val accuracy \\ \hline
-  1 & 1.51 \%\\
+  1 & 2.24 \%\\
   5 & 7.29 \%\\
-  10 & 16.53 \%\\
-  20 & 25.89 \%\\
+  10 & 18.4 \%\\
+  20 & 26.87 \%\\
   30 & 27.38 \%\\
-  50 & 22.64 \%\\
-  100 & \\
-  150 & \\
-  200 & \\
-  250 & \\
+  50 & 28.48 \%\\
+  100 & 30.00 \%\\
+  150 & 29.20 \%\\
+  200 & 28.93 \%\\
+  250 & 29.69 \%\\
   \hline  
 \end{tabular}
 \end{table}
