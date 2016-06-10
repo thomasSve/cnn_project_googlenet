@@ -84,7 +84,7 @@ def save_predictions(images, images_raw, network, classes, classes_words):
     
                 
 def main():
-    with load('googlenet_epochs.npz') as data:
+    with np.load('googlenet_epochs.npz') as data:
         results = data['results']
 
     epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
