@@ -2,6 +2,7 @@ import numpy as np
 import lasagne
 import googlenet
 import zipfile
+import theano
 from random import shuffle
 from math import floor
 from preprocess_zip import load_zip_val_set
