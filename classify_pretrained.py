@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import lasagne
 import googlenet
 import zipfile
@@ -75,20 +74,14 @@ def load_classes_name(wnids, archive):
 def load_classes(wnid_file):
     return [line.strip() for line in open(wnid_file)]
 
-def print_predictions(images, images_raw, network, classes, classes_words):
+def save_predictions(images, images_raw, network, classes, classes_words):
+    top5 = []
     for i in range(len(images)):
             prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
-            top5 = np.argsort(prob[0])[-1:-6:-1]
+            top5.append(np.argsort(prob[0])[-1:-6:-1])
 
-            plt.figure()
-            plt.imread(images_raw[i].astype('uint8'))
-            plt.axis('off')
-            for n, label in enumerate(top5):
-                plt.text(250, 70 + n * 20, '{}. {}'.format(n+1, classes_words[classes[label]]), fontsize=14)
-
-            plt.save("predicted_" + str(i) + ".JPEG")
-            print "Saved plot: predicted_" + str(i) + ".JPEG"
-            i = i + 1
+    np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words) 
+    
                 
 def main():
     zip_url = "tiny-imagenet-200.zip"
