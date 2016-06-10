@@ -15,6 +15,8 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{subcaption}
+\usepackage{wrapfig}
+
 \setcitestyle{square}
 
 
@@ -76,16 +78,26 @@ showstringspaces=false            %
 \maketitle
 
 \begin{abstract}
-  In this work, I use Convolutional Neural Networks trained on a GPU for classifying images in a tiny imagenet dataset. In particulay I have used the python library lasagne \cite{lasagne} to built on the googlenet \cite{googlenet} architecture.
+  I trained a Convolutional Neural Network on GPU for classifying images using the tiny ImageNet data set. The model is built after googlenet's \cite{googlenet} architecture using the python library lasagne \cite{lasagne}, which is built on top of theano \cite{theano}. The CNN network consist of 22 layers and achived a total accuracy of 30 \% when having 100 different classes. A reduced version with 20 different classes got a total of 37 \% accuracy on the test-set. More in depth analysis would have been considered if I had more time available to test several CNN networks. I also cut the original data set of 200 to 100 classes to reduce training time as I calculated it would take me up to three days to train with the 200 classes.
   
 \end{abstract}
 \section{Introduction}
+A common problem in machine learning is to effective representation of complex inputs such as image and video. Over the past years deep learning has proven to perform on such complex problems. 
 I use Convolutional Neural Networks for image classifications on the tiny ImageNet dataset, a smaller version of the ImageNet \cite{imagenet} challenge dataset.
 \section{Method}
 \subsection{Model}
 The model used to build the classifier is a model based on the googlenet architecture. I used the library lasagne \cite{lasagne} which is built on theano for deep learning. I also found the recipie for the model online \cite{googlenet-recipe}. The network has 22 layers where 9 of the layers is inception layers with dimensionality reductions. 
-\subsection{Dataset}
-The tiny ImageNet is a smaller version of the ImageNet dataset. The tiny versions consist of total 200 classes 
+\subsection{Data Set}
+Tiny ImageNet is a dataset with 120,000 labeled images into 200 different categories. The dataset is similar to the ImageNet used in the ILSVRC benchmark, known as the ImageNet challenge. The images in the tiny dataset have lower resolution and it's an smaller dataset in total. Each of the 200 categories consists of 500 training samples with a 64x64 resolution. The raw RGB pixel-values of these images areextracted and fed to the CNN network.
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \begin{center}
+    \includegraphics[width=0.4\textwidth]{images/cnn_embed_1k.jpg}
+  \end{center}
+  \caption{TSNE Embedding of Tiny Imagenet CNN Codes}
+  \label{fig:tiny-imagenet}
+\end{wrapfigure}
+
 \section{Experiment}
 
 
@@ -126,7 +138,8 @@ On epoch 50 it was actually lower than epoch 30. Looking closer at the runs, it 
 \end{tabular}
 \end{table}
 
-\begin{figure}
+
+\begin{figure}[!htbp]
         \begin{subfigure}[b]{0.25\textwidth}
                 \includegraphics[width=\linewidth]{example-image-a}
                 \caption{A gull}
@@ -147,11 +160,14 @@ On epoch 50 it was actually lower than epoch 30. Looking closer at the runs, it 
                 \caption{A mouse}
                 \label{fig:mouse}
         \end{subfigure}
-        \caption{Pictures of animals}\label{fig:animals}
+        \caption{Classifications}\label{fig:animals}
 \end{figure}
 
 \section{Conclusion}
 \begin{thebibliography}{9}
+\bibitem{theano}
+  J. Bergstra, O. Breuleux, F. Bastien, P. Lamblin, R. Pascanu, G. Desjardins, J. Turian, D. Warde-Farley and Y. Bengio. “Theano: A CPU and GPU Math Expression Compiler”. Proceedings of the Python for Scientific Computing Conference (SciPy) 2010. June 30 - July 3, Austin, TX
+  
 \bibitem{lasagne}
   Sander Dieleman, Lasagne is a lightweight library to build and train neural networks in Theano. \url{https://github.com/Lasagne/Lasagne}
 
