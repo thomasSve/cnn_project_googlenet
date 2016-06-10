@@ -77,19 +77,19 @@ def load_classes(wnid_file, archive):
 def save_predictions(images, images_raw, network, classes, classes_words):
     top5 = []
     for i in range(len(images)):
-            prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
+            prob = np.array(lasagne.layers.get_output(network, images[i].astype(theano.config.floatX), deterministic=True).eval())
             top5.append(np.argsort(prob[0])[-1:-6:-1])
 
     np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words) 
     
                 
 def main():
-    with np.load('googlenet_epochs.npz') as data:
-        results = data['results']
+    #with np.load('googlenet_epochs.npz') as data:
+    #    results = data['results']
 
-    epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
-    for i in epoch_print:
-        print "Results, epoch " + str(i) + ": " + str(results[i - 1])
+    #epoch_print = [1, 5, 10, 20, 30, 50, 100, 150, 200, 250]
+    #for i in epoch_print:
+    #    print "Results, epoch " + str(i) + ": " + str(results[i - 1])
 
         
     zip_url = "tiny-imagenet-200.zip"

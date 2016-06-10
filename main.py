@@ -61,7 +61,7 @@ def train_network(num_epochs, X_train, y_train, X_val, y_val, train_fn, val_fn, 
             np.savez("epoch_googlenet_100_" + str(epoch + 1) +".npz", *lasagne.layers.get_all_param_values(network))
         
 
-    np.savez('googlenet_epochs.npz', results)
+    np.savez('googlenet_epochs.npz', results=results)
 
         
             
