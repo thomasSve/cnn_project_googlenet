@@ -78,8 +78,9 @@ def load_classes(wnid_file, archive):
 def save_predictions(images, images_raw, network, classes, classes_words):
     top5 = []
     for i in range(len(images)):
-            prob = np.array(lasagne.layers.get_output(network, images[i].astype(theano.config.floatX), deterministic=True).eval())
-            top5.append(np.argsort(prob[0])[-1:-6:-1])
+        print images[i].shape
+        prob = np.array(lasagne.layers.get_output(network, images[i], deterministic=True).eval())
+        top5.append(np.argsort(prob[0])[-1:-6:-1])
 
     np.savez("predictions.npz", top=top5, images=images, images_raw=images_raw, classes=classes, classes_words=classes_words) 
     
@@ -103,11 +104,16 @@ def main():
     archive = zipfile.ZipFile(zip_url, 'r')
     wnids = [line.strip() for line in archive.open(wnid_file)] # Load list over classes
     wnids = wnids[:100] # Load only the 100 first classes
+
+    print "Loading classes"
     classes_words = load_classes_name(wnids, archive)
-    
+
+    print "Loading network"
     network = load_network()
     #network = load_pickle_googlenet()
     #images, images_raw = random_test_images()
+
+    print ""
     X, X_raw = load_images(val_path, wnids, archive)
 
     data = zip(X, X_raw)
