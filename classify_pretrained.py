@@ -20,7 +20,7 @@ def load_pickle_googlenet():
 
 def load_network():
     network = googlenet.build_model()
-    with np.load('trained_alexnet_200.npz') as f:
+    with np.load('trained_googlenet_100.npz') as f:
         param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     lasagne.layers.set_all_param_values(network, param_values)
     
