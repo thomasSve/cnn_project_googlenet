@@ -33,6 +33,12 @@ rapport/*
 !rapport/images/
 !rapport/images/*
 
+# Include everything within the code folder
+!report/
+
+report/*
+!report/cnn_project_rapport.pdf
+
 # Include README.md
 !README.md
 
